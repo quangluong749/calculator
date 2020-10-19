@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+</head>
+
+<body>
+    <div class="container">
+        <h2>Bé tập tính</h2>
+        <form class="form-horizontal">
+            <div class="form-group">
+                <label class="col-sm-2 control-label">Số thứ nhất:</label>
+                <div class="col-sm-2">
+                    <input class="form-control" id="numb1" type="text" value="">
+                </div>
+                <div class="col-sm-2">
+                    <label class="radio-inline"><input type="radio" name="calculation" class="myRadio"value="cong">Cộng</label>
+                    <label class="radio-inline"><input type="radio" name="calculation" class="myRadio" value="tru">Trừ</label>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label class="col-sm-2 control-label">Số thứ hai:</label>
+                <div class="col-sm-2">
+                    <input class="form-control" id="numb2" type="text" value="">
+                </div>
+                <div class="col-sm-2">
+                    <label class="radio-inline"><input type="radio" name="calculation" class="myRadio" value="nhan">Nhân</label>
+                    <label class="radio-inline"><input type="radio" name="calculation" class="myRadio" value="chia">Chia</label>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label class="col-sm-2 control-label">Kết quả:</label>
+                <div class="col-sm-2">
+                    <input class="form-control" id="result" type="text" value="">
+                </div>
+                <div class="col-sm-2">
+                    <button type="button" class="btn btn-primary" id="calculate">Tính</button>
+                </div>
+            </div>
+            <div class="col-sm-6 text-center text-danger" id="warning">
+            </div>
+          
+            
+
+        </form>
+    </div>
+
+    <script>
+        var invalid1 = "Giá trị nhập ở ô <mark>Số thứ nhất</mark> không phải là số";
+        var invalid2 = "Giá trị nhập ở ô <mark>Số thứ hai</mark> không phải là số";
+        var chooseOpt = "Vui lòng chọn phép tính";
+        var emptyInp = "Vui lòng nhập đủ dữ liệu hoặc kiểm tra lại dữ liệu bạn nhập có hợp lệ";
+        var overNumb = "Số bạn nhập đã quá ngưỡng cho phép";
+
+        var number1 = document.getElementById("numb1");             // Đại diện cho ô nhập thứ nhất
+        var number2 = document.getElementById("numb2");             // Đại diện cho ô nhập thứ hai
+        var result = document.getElementById("calculate");          // Đại diện cho nút Tính
+
+
+        // hàm kiểm tra bạn đã chọn phép tính hay chưa và 
+        // return ra index đại diện cho phép tính 0: "+", 1: "-", 2: "*", 3: "/"
+        function checkOpt() {
+            var opt = document.getElementsByClassName("myRadio");
+            for (let i = 0; i < opt.length; i++)
+                if(opt[i].checked)
+                    return i;           
+            return -1;          // Neu chua chon phep tinh
+        }
+
+        // hàm đưa ra cảnh báo khi bạn nhập 
+        function getWarning(test) {
+            document.getElementById("warning").innerHTML = test;
+        }
+
+        // hàm set giá trị cho ô input kết quả
+        function setResult(res) {
+            if (res % 1 === 0)
+                document.getElementById("result").value = res
+            else 
+                document.getElementById("result").value = res.toFixed(3);
+            getWarning("");
+        }
+
+        // Hàm kiểm tra 2 ô input có nhập giá trị quá ngưỡng cho phép hay không
+        function isOverThreshold(obj) {
+            if (parseFloat(obj.value) > 999999999 || parseFloat(obj.value) < -999999999)
+                getWarning(overNumb);
+            else
+                getWarning("");
+        }
+
+        // thêm event báo lỗi khi dời chuột khỏi ô input1 mà giá trị nhập không hợp lệ
+        number1.addEventListener("blur", function() {
+            if (isNaN(this.value))
+                getWarning(invalid1);
+            else
+                getWarning("");
+        });
+
+        // thêm event báo lỗi khi dời chuột khỏi ô input1 mà giá trị nhập quá ngưỡng
+        number1.addEventListener("blur", function() {
+            isOverThreshold(this);
+        });
+
+        // thêm event báo lỗi khi dời chuột khỏi ô input1 mà giá trị nhập không hợp lệ
+        number2.addEventListener("blur", function() {
+            if (isNaN(this.value))
+                getWarning(invalid2);
+            else
+                getWarning("");
+        });
+
+        // thêm event báo lỗi khi dời chuột khỏi ô input1 mà giá trị nhập quá ngưỡng
+        number2.addEventListener("blur", function() {
+            isOverThreshold(this);
+        });
+
+        function IsValid(obj) {
+            if((isNaN(obj.value)) || obj.value == "")
+                return false;
+            return true;
+        }
+
+        // thêm event khi click button "Tính"
+        result.addEventListener("click", function() {
+            if (!IsValid(number1) || !IsValid(number2))         // Kiểm tra giá trị hai sô đã nhập có hợp lệ
+                getWarning(emptyInp); 
+            else {
+                switch(parseInt(checkOpt())) {
+                    case -1: {
+                        getWarning(chooseOpt);
+                        break;
+                    }
+                    case 0: {
+                        setResult(parseFloat(number1.value) + parseFloat(number2.value));
+                        break;
+                    }
+                    case 1: {
+                        setResult(parseFloat(number1.value) - parseFloat(number2.value));
+                        break;
+                    }
+                    case 2: {
+                        setResult(parseFloat(number1.value) * parseFloat(number2.value));
+                        break;
+                    }
+                    case 3: {
+                        setResult(parseFloat(number1.value) / parseFloat(number2.value));
+                    }
+                }
+            }
+
+        });
+
+    </script>
+</body>
+
+</html>
